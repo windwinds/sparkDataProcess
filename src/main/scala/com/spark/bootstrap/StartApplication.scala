@@ -10,14 +10,18 @@ object StartApplication {
 
     val SparkConfig = new SparkConfig()
     val sc = SparkConfig.getSparkContext("local")
-    val inputPath = "/Users/lyc/IdeaProjects/sparkDataProcess/data/2015-01.csv"
-    val outputPath = "resultData";
+    val inputPath = "data/2015-01.csv"
+    val outputPath = "resultData"
     val input = sc.textFile(inputPath)
 
     val airDataETL = new AirDataETL()
     val cleanData = airDataETL.cleanWrongData(input)
 
-    println(cleanData.count())
+    cleanData.persist()
+
+    //println(cleanData.top(10))
+
+    cleanData.map(airDataETL.arrayToString).take(10).foreach(println)
 
     FileUtil.deleteLocalFile(outputPath)
 
