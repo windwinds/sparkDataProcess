@@ -54,8 +54,20 @@ class AirDataETL extends Serializable {
     */
   def getRddByPollutionName(inputRdd: RDD[Array[String]], pollutions: Array[String]): RDD[Array[String]]={
 
-//    inputRdd.map()
-    return inputRdd
+    val columnIdArray = new Array[Int](pollutions.length)
+    var index = 0
+    for (pollution <- pollutions){
+      var flag = true
+      for (i <- Range(0, columns.length) if flag){
+        if (columns(i).equals(pollution)){
+          columnIdArray(index) = i
+          index += 1
+          flag = false
+        }
+      }
+    }
+    val resultRdd = inputRdd.map(array => selectArrayByName(array, columnIdArray))
+    return resultRdd
   }
 
   def selectArrayByName(array: Array[String], idArray: Array[Int]): Array[String] ={
@@ -65,6 +77,17 @@ class AirDataETL extends Serializable {
       result(i) = array(idArray(i))
     }
     return result
+  }
+
+  /**
+    * 将RDD作为字符串输出
+    * @param inputRdd
+    * @param num: 输出条数
+    */
+  def printRdd(inputRdd: RDD[Array[String]], num: Int):Unit={
+
+    inputRdd.map(arrayToString).top(num).foreach(println)
+
   }
 
 

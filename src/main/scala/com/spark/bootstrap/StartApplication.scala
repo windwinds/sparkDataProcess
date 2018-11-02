@@ -21,9 +21,12 @@ object StartApplication {
 
     //println(cleanData.top(10))
 
-    cleanData.map(airDataETL.arrayToString).take(10).foreach(println)
+    //cleanData.map(airDataETL.arrayToString).take(10).foreach(println)
+    val aqiRdd = airDataETL.getRddByPollutionName(cleanData, Array("time", "city", "site","aqi"))
 
-    FileUtil.deleteLocalFile(outputPath)
+    airDataETL.printRdd(aqiRdd, 100)
+
+    //FileUtil.deleteLocalFile(outputPath)
 
 
   }
