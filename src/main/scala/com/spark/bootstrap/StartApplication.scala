@@ -21,13 +21,16 @@ object StartApplication {
 
     //println(cleanData.top(10))
 
-    //cleanData.map(airDataETL.arrayToString).take(10).foreach(println)
-    val aqiRdd = airDataETL.getRddByPollutionName(cleanData, Array("time", "city", "site","aqi"))
-
-    airDataETL.printRdd(aqiRdd, 100)
-
+    //得到只包含aqi的rdd
+//    val aqiRdd = airDataETL.getRddByPollutionName(cleanData, Array("time", "city", "site","aqi"))
+    //测试输出方法
+//    airDataETL.printRdd(aqiRdd, 100)
     //FileUtil.deleteLocalFile(outputPath)
 
+    //广播:市-省的map
+    val cityToProvince = sc.broadcast(airDataETL.getCityToProvinceMap())
+    val addProvinceRdd = airDataETL.addProvinceForRdd(cleanData, cityToProvince.value)
+    airDataETL.printRdd(addProvinceRdd, 100)
 
   }
 

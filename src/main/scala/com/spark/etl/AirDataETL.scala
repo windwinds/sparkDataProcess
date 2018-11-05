@@ -1,12 +1,17 @@
 package com.spark.etl
 
+import java.util
+
 import org.apache.spark.rdd.RDD
+
+import scala.io.Source
 
 class AirDataETL extends Serializable {
 
   val columns = Array("time", "city", "site", "aqi", "pm2.5", "pm2.5_24h", "pm10", "pm10_24h",
     "so2", "so2_24h", "no2", "no2_24h", "o3", "o3_24h", "o3_8h", "o3_8h_24h", "co",
     "co_24h")
+  val cityFile = "data/province_city.txt"
 
   /**
     * 判断数组中包含空值的数据
@@ -88,6 +93,41 @@ class AirDataETL extends Serializable {
 
     inputRdd.map(arrayToString).top(num).foreach(println)
 
+  }
+
+  /**
+    * 读取省市文件，得到市为key，省为value的Map
+    * @return
+    */
+  def getCityToProvinceMap():util.HashMap[String, String]={
+    val hashMap = new util.HashMap[String, String]()
+    val file = Source.fromFile(cityFile)
+    for (line <- file.getLines()){
+      val str = line.split(" ")
+      hashMap.put(str(1), str(0))
+    }
+    hashMap
+  }
+
+  /**
+    * 在输入的rdd中加上城市对应省的信息
+    * @param inputRdd
+    * @param cityMap
+    * @return
+    */
+  def addProvinceForRdd(inputRdd: RDD[Array[String]],
+                        cityMap: util.HashMap[String, String]):RDD[Array[String]]={
+    inputRdd.map(stringArray => {
+      val cityName = stringArray(1)
+      val provinceName = cityMap.get(cityName)
+      val resultArray = new Array[String](stringArray.length+1)
+      resultArray(0) = stringArray(0)
+      resultArray(1) = provinceName
+      for (i <- Range(1, stringArray.length)){
+        resultArray(i+1) = stringArray(i)
+      }
+      resultArray
+    })
   }
 
 
