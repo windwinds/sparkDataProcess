@@ -12,6 +12,7 @@ class AirDataETL extends Serializable {
     "so2", "so2_24h", "no2", "no2_24h", "o3", "o3_24h", "o3_8h", "o3_8h_24h", "co",
     "co_24h")
   val cityFile = "data/province_city.txt"
+  val locationFile = "data/location.txt"
 
   /**
     * 判断数组中包含空值的数据
@@ -143,6 +144,45 @@ class AirDataETL extends Serializable {
     val addressRdd = inputRdd.map(stringArray => stringArray(1) + stringArray(2) + stringArray(3)).distinct()
     val resultArray = addressRdd.collect()
     resultArray
+  }
+
+
+  /**
+    * 读取位置文件，得到地址为key，经纬度为value的Map
+    * @return
+    */
+  def getAddressToCoordinateMap():util.HashMap[String, Array[String]]={
+    val hashMap = new util.HashMap[String, Array[String]]()
+    val file = Source.fromFile(locationFile)
+    for (line <- file.getLines()){
+      val str = line.split(" ")
+      hashMap.put(str(0), Array(str(1), str(2)) )
+    }
+    hashMap
+  }
+
+  /**
+    * 在添加省信息后的rdd基础上，加上经纬度坐标信息
+    * @param inputRdd
+    * @param addressMap
+    * @return
+    */
+  def addLngAndLatForRdd(inputRdd: RDD[Array[String]],
+                         addressMap: util.HashMap[String, Array[String]]):RDD[Array[String]]={
+    inputRdd.map(stringArray => {
+      val address = stringArray(1) + stringArray(2) + stringArray(3)
+      val lngLatArray = addressMap.get(address)
+      val resultArray = new Array[String](stringArray.length+2)
+      for (i <- Range(0, 4)){
+        resultArray(i) = stringArray(i)
+      }
+      resultArray(4) = lngLatArray(0)
+      resultArray(5) = lngLatArray(1)
+      for (i <- Range(4, stringArray.length)){
+        resultArray(i+2) = stringArray(i)
+      }
+      resultArray
+    })
   }
 
 }
