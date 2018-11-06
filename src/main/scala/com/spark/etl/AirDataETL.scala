@@ -24,14 +24,18 @@ class AirDataETL extends Serializable {
       return false
 
     for (value <- array){
-      if (value == null || value == "")
+      if (value == null || value == "" || value.contains("  "))
         return false
     }
     return true
   }
 
 
-  //删除RDD中不全的数据
+  /**
+    * 去除rdd中不全的数据
+    * @param inputRDD
+    * @return
+    */
   def cleanWrongData(inputRDD: RDD[String]):RDD[Array[String]]={
 
     inputRDD.map(x => x.split(",")).filter(isContainNull)
@@ -130,5 +134,15 @@ class AirDataETL extends Serializable {
     })
   }
 
+  /**
+    * 得到rdd中所有地址，不能有重复
+    * @param inputRdd
+    * @return
+    */
+  def getAddressArrayFromRdd(inputRdd: RDD[Array[String]]):Array[String]={
+    val addressRdd = inputRdd.map(stringArray => stringArray(1) + stringArray(2) + stringArray(3)).distinct()
+    val resultArray = addressRdd.collect()
+    resultArray
+  }
 
 }

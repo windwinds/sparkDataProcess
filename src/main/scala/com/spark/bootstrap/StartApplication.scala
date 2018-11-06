@@ -2,7 +2,7 @@ package com.spark.bootstrap
 
 import com.spark.config.SparkConfig
 import com.spark.etl.AirDataETL
-import com.spark.utils.FileUtil
+import com.spark.utils.{AddressUtil, FileUtil}
 
 object StartApplication {
 
@@ -30,7 +30,15 @@ object StartApplication {
     //广播:市-省的map
     val cityToProvince = sc.broadcast(airDataETL.getCityToProvinceMap())
     val addProvinceRdd = airDataETL.addProvinceForRdd(cleanData, cityToProvince.value)
+    addProvinceRdd.persist()
     airDataETL.printRdd(addProvinceRdd, 100)
+    cleanData.unpersist()
+
+    //得到地点对应的经纬度文件
+//    val addressList = airDataETL.getAddressArrayFromRdd(addProvinceRdd)
+//    addressList.foreach(println)
+//    AddressUtil.getLocationByAddress(addressList)
+
 
   }
 
