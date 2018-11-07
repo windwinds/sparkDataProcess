@@ -35,16 +35,16 @@ object StartApplication {
     cleanData.unpersist()
 
     //得到地点对应的经纬度文件
-//    val addressList = airDataETL.getAddressArrayFromRdd(addProvinceRdd)
-//    addressList.foreach(println)
-//    AddressUtil.getLocationByAddress(addressList)
+    val addressList = airDataETL.getAddressArrayFromRdd(addProvinceRdd)
+    addressList.foreach(println)
+    AddressUtil.getLocationByAddress(addressList)
 
     //广播:address-location的map
-    val addressToLocation = sc.broadcast(airDataETL.getAddressToCoordinateMap())
-    val addLocationRdd = airDataETL.addLngAndLatForRdd(addProvinceRdd, addressToLocation.value)
-    addLocationRdd.persist()
-    airDataETL.printRdd(addLocationRdd, 100)
-    addProvinceRdd.unpersist()
+//    val addressToLocation = sc.broadcast(airDataETL.getAddressToCoordinateMap())
+//    val addLocationRdd = airDataETL.addLngAndLatForRdd(addProvinceRdd, addressToLocation.value)
+//    addLocationRdd.persist()
+//    airDataETL.printRdd(addLocationRdd, 100)
+//    addProvinceRdd.unpersist()
 
 
   }
