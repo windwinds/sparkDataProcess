@@ -11,10 +11,24 @@
     <dependencies>
         <dependency>
             <groupId>org.apache.spark</groupId>
-            <artifactId>spark-core_2.11</artifactId>
+            <artifactId>spark-core_2.10</artifactId>
             <version>1.5.1</version>
             <!--<scope>provided</scope>-->
         </dependency>
+
+        <dependency>
+            <groupId>org.apache.spark</groupId>
+            <artifactId>spark-sql_2.10</artifactId>
+            <version>1.5.1</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.spark</groupId>
+            <artifactId>spark-hive_2.10</artifactId>
+            <version>1.5.1</version>
+            <!--<scope>provided</scope>-->
+        </dependency>
+
 
         <dependency>
             <groupId>com.alibaba</groupId>
@@ -27,19 +41,45 @@
     <build>
         <pluginManagement>
             <plugins>
+                <!--<plugin>-->
+                    <!--<groupId>org.apache.maven.plugins</groupId>-->
+                    <!--<artifactId>maven-compiler-plugin</artifactId>-->
+                    <!--<version>3.1</version>-->
+                    <!--&lt;!&ndash; 一般而言，target与source是保持一致的，但是，有时候为了让程序能在其他版本的jdk-->
+                    <!--中运行(对于低版本目标jdk，源代码中不能使用低版本jdk中不支持的语法)，会存在target不同于-->
+                    <!--source的情况 &ndash;&gt;-->
+                    <!--<configuration>-->
+                        <!--<source>1.8</source>-->
+                        <!--<target>1.8</target>-->
+                    <!--</configuration>-->
+                <!--</plugin>-->
                 <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-compiler-plugin</artifactId>
-                    <version>3.1</version>
-                    <!-- 一般而言，target与source是保持一致的，但是，有时候为了让程序能在其他版本的jdk
-                    中运行(对于低版本目标jdk，源代码中不能使用低版本jdk中不支持的语法)，会存在target不同于
-                    source的情况 -->
+                    <artifactId>maven-assembly-plugin</artifactId>
                     <configuration>
-                        <source>1.8</source>
-                        <target>1.8</target>
+                        <appendAssemblyId>false</appendAssemblyId>
+                        <descriptorRefs>
+                            <descriptorRef>jar-with-dependencies</descriptorRef>
+                        </descriptorRefs>
+                        <archive>
+                            <manifest>
+                                <mainClass>com.spark.bootstrap.StartApplication</mainClass>
+                            </manifest>
+                        </archive>
                     </configuration>
+                    <executions>
+                        <execution>
+                            <id>make-assembly</id>
+                            <phase>package</phase>
+                            <goals>
+                                <goal>assembly</goal>
+                            </goals>
+                        </execution>
+                    </executions>
                 </plugin>
+
             </plugins>
+
+
         </pluginManagement>
     </build>
 

@@ -10,7 +10,7 @@ class SparkConfig {
       val conf = new SparkConf().setMaster("local").setAppName("test")
       new SparkContext(conf)
     }else{
-      val conf = new SparkConf().setAppName(environment)
+      val conf = new SparkConf().setAppName(environment).setMaster("spark://master:7077")
       new SparkContext(conf)
     }
 
