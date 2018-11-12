@@ -22,8 +22,8 @@ object StartApplication {
     val input = sc.textFile(inputPath)
 
     val airDataETL = new AirDataETL()
-    val cleanData = airDataETL.cleanWrongData(input)
-
+    //val cleanData = airDataETL.cleanWrongData(input)
+    val cleanData = airDataETL.transformEmptyData(input)
     //cleanData.persist()
 
     //println(cleanData.top(10))
@@ -59,7 +59,7 @@ object StartApplication {
     airDataFrame.registerTempTable("airData")
     val select = sqlContext.sql("select * from airData")
     select.show(100)
-    airDataFrame.write.mode("overwrite").saveAsTable("solap.etlAirData_tbl")
+    airDataFrame.write.mode("overwrite").saveAsTable("solap.etlAirData_all")
 
   }
 

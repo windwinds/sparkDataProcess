@@ -48,6 +48,25 @@ class AirDataETL extends Serializable {
 
   }
 
+  /**
+    * 将rdd中的空数据补全，用0替代
+    * @param inputRDD
+    * @return
+    */
+  def transformEmptyData(inputRDD: RDD[String]):RDD[Array[String]]={
+
+    inputRDD.map(str => {
+      val strArray = str.split(",")
+      for (i <- Range(0, strArray.length)){
+        val value = strArray(i)
+        if (value == null || value == "" || value.trim().isEmpty){
+          strArray(i) = "0"
+        }
+      }
+      strArray
+    }).filter(isContainNull)
+  }
+
   def arrayToString(array: Array[String]):String={
 
     var result:String = ""
@@ -229,6 +248,55 @@ class AirDataETL extends Serializable {
     return true
   }
 
+  def transformArray(strArray: Array[String]):Array[String]={
+    for (i <- Range(0, strArray.length)){
+      if (strArray(i)==null || strArray(i).trim.isEmpty || strArray(i).equals("_"))
+        strArray(i) = "0"
+    }
+    val format = "((19|20)[0-9]{2})-(0?[1-9]|1[012])-(0?[1-9]|[12][0-9]|3[01]) " + "([01]?[0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]"
+    if (strArray(0).matches(format) == false){
+      strArray(0) = "0-0-0 00:00:00"
+    }
+    val dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
+    val compareTime = dateFormat.parse("2016-07-01 00:00:00")
+    val time = dateFormat.parse(strArray(0))
+
+    var resultArray = strArray
+    if (compareTime.compareTo(time) > 0){
+      if (strArray.length < 20){
+        val ss = new Array[String](20)
+        for (i <- Range(0, strArray.length)){
+          ss(i) = strArray(i)
+        }
+        for (i <- Range(strArray.length, ss.length)){
+          ss(i) = "0"
+        }
+        resultArray = ss
+      }
+    }else{
+      if (strArray.length < 16){
+        val ss = new Array[String](16)
+        for (i <- Range(0, strArray.length)){
+          ss(i) = strArray(i)
+        }
+        for (i <- Range(strArray.length, ss.length)){
+          ss(i) = "0"
+        }
+        resultArray = ss
+      }
+    }
+
+    val pattern = "^([1-9]+(\\.\\d+)?|0\\.\\d+)$"
+    if (resultArray(6).matches(pattern) == false){
+      resultArray(6) = "0"
+    }
+    for (i <- Range(9, resultArray.length)){
+      if (resultArray(i).matches(pattern) == false){
+        resultArray(i) = "0"
+      }
+    }
+    resultArray
+  }
 
   /**
     * 将输入rdd转换为统一形式AirData，2016-07及其之后的数据和之前的数据格式不一样,
@@ -238,7 +306,7 @@ class AirDataETL extends Serializable {
     */
   def transformRdd(inputRdd: RDD[Array[String]]):RDD[AirData]={
 
-    inputRdd.filter(filterRdd).map(stringArray => {
+    inputRdd.map(transformArray).map(stringArray => {
 
       val dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
       val compareTime = dateFormat.parse("2016-07-01 00:00:00")

@@ -20,7 +20,8 @@ object LocalStart {
     val input = sc.textFile(inputPath)
 
     val airDataETL = new AirDataETL()
-    val cleanData = airDataETL.cleanWrongData(input)
+    //val cleanData = airDataETL.cleanWrongData(input)
+    val cleanData = airDataETL.transformEmptyData(input)
 
     val cityToProvince = sc.broadcast(airDataETL.getCityToProvinceMap())
     val addProvinceRdd = airDataETL.addProvinceForRdd(cleanData, cityToProvince.value)
