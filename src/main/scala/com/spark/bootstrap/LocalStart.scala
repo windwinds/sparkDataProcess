@@ -16,7 +16,7 @@ object LocalStart {
 
     val SparkConfig = new SparkConfig()
     val sc = SparkConfig.getSparkContext("local")
-    val inputPath = "data/2016-07.csv"
+    val inputPath = "data/2015-01.csv"
     val input = sc.textFile(inputPath)
 
     val airDataETL = new AirDataETL()
