@@ -81,6 +81,20 @@ class HilbertTransform {
     (a, b)
   }
 
+  /**
+    * 根据矩阵行列数求N得值，返回2的N次方大于等于max(rowNum, colNum)的最小值
+    * @param rowNum
+    * @param colNum
+    */
+  def rowNumAndColNumGetN(rowNum: Int, colNum: Int)={
+    val max = Math.max(rowNum, colNum)
+    var n = 1
+    while (Math.pow(2, n) < max){
+      n+=1
+    }
+    Math.pow(2, n).toInt
+  }
+
 
 
 
