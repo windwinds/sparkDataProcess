@@ -9,7 +9,7 @@ object HBaseClient {
   def main(args: Array[String]): Unit = {
     val conf = HBaseConfiguration.create()
 
-    conf.set("hbase.zookeeper.quorum", "master, dell4, xiadclinux")
+    //conf.set("hbase.zookeeper.quorum", "master, dell4, xiadclinux")
 
     val table = new HTable(conf, "testtable")
 
