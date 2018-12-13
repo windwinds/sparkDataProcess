@@ -9,6 +9,19 @@ import scala.reflect.internal.util.TableDef.Column
 object HBaseClient {
 
   val conf = HBaseConfiguration.create()
+  conf.set("hbase.rootdir", "hdfs://master:9000/hbase")
+  conf.set("hbase.cluster.distributed", "true")
+  conf.set("hbase.zookeeper.quorum", "master,dell4,xiadclinux")
+  conf.set("hbase.zookeeper.property.clientPort", "2181")
+  conf.set("hbase.zookeeper.property.dataDir", "/usr/local/hadoop-2.6.0/zookeeper-3.4.8")
+  conf.set("hbase.master.info.port", "60010")
+  conf.set("hbase.regionserver.info.port", "60030")
+  conf.set("hbase.rest.port", "8090")
+
+
+  def getHTableByName(tableName: String)={
+    new HTable(conf, tableName)
+  }
 
 
   def selectOneColumnByRowKey(tableName: String, rowKey: Array[Byte], family: Array[Byte], column: Array[Byte]): Array[Byte] ={
