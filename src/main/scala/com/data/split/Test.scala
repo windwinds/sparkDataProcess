@@ -1,6 +1,11 @@
 package com.data.split
 
+import java.sql.Timestamp
+import java.text.SimpleDateFormat
+import java.util
 import java.util.ArrayList
+
+import com.data.storage.GridDataToHBase
 
 /**
   * @Auther: liyongchang
@@ -29,6 +34,16 @@ object Test {
     }
     resultList
 
+  }
+
+  def arrayToList(array: Array[String])={
+
+    val list = new ArrayList[String]
+
+    for (str <- array){
+      list.add(str)
+    }
+    list
   }
 
   def main(args: Array[String]):Unit={
@@ -64,6 +79,16 @@ object Test {
       val hilbertTileList = tileSplit.tileNumToHilbertCode(tileResult)
       pollutionTileList.add(hilbertTileList)
     }
+
+    val tileList = transformTileList(pollutionTileList)
+
+    val gridDataToHBase = new GridDataToHBase
+    val date = "2016-06-12 08:00:00"
+    val format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
+    val d = format.parse(date)
+    val timestamp = new Timestamp(d.getTime()).getTime/1000
+    gridDataToHBase.addData(timestamp, 1, 1, tileList, arrayToList(pollutionList))
+
 
 
   }
