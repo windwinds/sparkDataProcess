@@ -43,12 +43,23 @@ class GridDataToHBase {
       val cellSize = tileData._4
       val hightWidth = tileData._5
 
+      //横纵轴瓦片的个数
+      val rowTileNum = tileData._6._1
+      val colTileNum = tileData._6._2
+
       val put = new Put(Bytes.toBytes(rowKey))
-      put.add(Bytes.toBytes("properties"), Bytes.toBytes("lng"), Bytes.toBytes(lnglat._1))
-      put.add(Bytes.toBytes("properties"), Bytes.toBytes("lat"), Bytes.toBytes(lnglat._2))
-      put.add(Bytes.toBytes("properties"), Bytes.toBytes("cellSize"), Bytes.toBytes(cellSize))
       put.add(Bytes.toBytes("properties"), Bytes.toBytes("hight"), Bytes.toBytes(hightWidth._1))
       put.add(Bytes.toBytes("properties"), Bytes.toBytes("width"), Bytes.toBytes(hightWidth._2))
+
+      //只在编号为0的瓦片记录行中存储，节省空间
+      if (hilbertCode == 0){
+        put.add(Bytes.toBytes("properties"), Bytes.toBytes("row"), Bytes.toBytes(rowTileNum))
+        put.add(Bytes.toBytes("properties"), Bytes.toBytes("col"), Bytes.toBytes(colTileNum))
+        put.add(Bytes.toBytes("properties"), Bytes.toBytes("lng"), Bytes.toBytes(lnglat._1))
+        put.add(Bytes.toBytes("properties"), Bytes.toBytes("lat"), Bytes.toBytes(lnglat._2))
+        put.add(Bytes.toBytes("properties"), Bytes.toBytes("cellSize"), Bytes.toBytes(cellSize))
+      }
+
       for (pollutionIndex <- Range(0, columnFamilyList.size())){
         val data = dataList.get(pollutionIndex)
         val dataBytes = DataTransformUtil.floatArrayToBytesArray(data)
@@ -76,6 +87,11 @@ class GridDataToHBase {
     timeStamp*1000000000L + provinceNo*10000000L + cityNo*100000L + hilbertCode
   }
 
+
+  def generateRowKeyNoHilbertCode(timeStamp: Long, provinceNo: Long, cityNo: Long): Long ={
+    val rowKey = timeStamp*1000000000L + provinceNo*10000000L + cityNo*100000L
+    rowKey
+  }
 
 
 

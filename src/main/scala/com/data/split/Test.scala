@@ -48,7 +48,7 @@ object Test {
 
   def main(args: Array[String]):Unit={
 
-//    val hilbert = new HilbertTransform()
+    val hilbert = new HilbertTransform()
 //    val n = 8
 //    for (i <- Range(0, n)){
 //      for (j <- Range(0, n)){
@@ -57,11 +57,17 @@ object Test {
 //      }
 //      println()
 //    }
+//    for (n <- Range(0, 100)){
+//      val d = hilbert.xyToHilbertCode(n, 0, 0)
+//      print(d + " ")
+//    }
+
 //    for (i <- Range(0, 64)){
 //      val xy = hilbert.hilbertCodeToXY(n, i)
 //      println(xy._1, xy._2)
 //    }
 
+    //插入数据
     val pollutionList = Array("aqi", "pm25", "pm10", "co", "no2", "ozone1hour", "ozone8hour", "so2")
 
     val time = "2016-11-11 08:00:00"

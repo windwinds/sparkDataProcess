@@ -86,7 +86,10 @@ class TileSplit(fileName: String) {
         tileRowList.add(data.get(j))
       }
       //瓦片左上角纬度
-      var lat = yllcorner + (nrows - startRowNum-1) * cellsize
+      //var lat = yllcorner + (nrows - startRowNum-1) * cellsize
+
+      var lat = yllcorner      //直接用原始文件左下角维度，只存一次，每个瓦片根据此经纬度计算
+
       //瓦片实际高度，最上面的瓦片可能不同
       val tileHeight = tileRowList.size()
       for (col <- Range(0, tileColNum)){
@@ -101,7 +104,10 @@ class TileSplit(fileName: String) {
         val xy = (col, i)
         val tileData = new Array[Float](tileHeight*tileWidth)
         //瓦片左上角经度
-        var lng = xllcorner + col * tileLength * cellsize
+        //var lng = xllcorner + col * tileLength * cellsize
+
+        var lng = xllcorner
+
         val lnglat = (lng, lat)
         val hightWidth = (tileHeight, tileWidth)
         var index = 0
