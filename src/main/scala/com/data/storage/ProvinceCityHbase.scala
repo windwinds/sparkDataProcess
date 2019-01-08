@@ -1,18 +1,21 @@
-import org.apache.spark.{SparkConf, SparkContext}
-import java.io.File
-import java.sql.{Connection, DriverManager, ResultSet}
+package com.data.storage
 
+import java.sql.{Connection, DriverManager, ResultSet}
 import com.owlike.genson.defaultGenson._
+import java.io.File
 import org.apache.commons.io.FileUtils
-import org.apache.hadoop.hbase.{HBaseConfiguration, HColumnDescriptor, HTableDescriptor}
 import org.apache.hadoop.hbase.client.{Get, HBaseAdmin, HTable, Put}
 import org.apache.hadoop.hbase.util.Bytes
-/**
-  * @Auther: liyongchang
-  * @Date: 2018/10/31 15:25
-  * @Description
-  */
-object Test {
+import org.apache.hadoop.hbase.{HBaseConfiguration, HColumnDescriptor, HTableDescriptor}
+import org.apache.spark.{SparkConf, SparkContext}
+
+/*
+*@Description:
+*@Return:${returns}
+*@Author:LiumingYan
+*@Date 15:292019/1/4
+*/
+ object ProvinceCityHbase {
   var hprovince, hcity, hcode, province_code = ""
 
   //spark运行环境
@@ -28,7 +31,6 @@ object Test {
   conf.set("hbase.master.info.port", "60010")
   conf.set("hbase.regionserver.info.port", "60030")
   conf.set("hbase.rest.port", "8090")
-
   //  //设置查询的表名
   //  conf.set(TableInputFormat.INPUT_TABLE, "user")
 
@@ -37,6 +39,13 @@ object Test {
   case class city_result(name: String, code: String)
 
   def create_table(table_name: String, colFamily: Array[String]): HTable = {
+    /*
+    *@Description :创建hbase表
+    *@Param 表名，列族
+    *@Return 创建的hbase表
+    *@Author:LiumingYan
+    *@Date
+    */
     //conf.set("hbase.zookeeper.quorum", "master, dell4, xiadclinux")
     val hadmin = new HBaseAdmin(conf)
     if (!hadmin.isTableAvailable(table_name)) {
@@ -78,34 +87,34 @@ object Test {
     value
   }
 
-//  def scan(table: HTable, rowKey: Array[Byte], family: Array[Byte], column: Array[Byte]): Unit = {
-//    val s = new Scan()
-//    s.addColumn(family, column)
-//    val scanner:ResultScanner = table.getScanner(s)
-//    val results = scanner.iterator
-//    try {
-////      for (r <- scanner) {
-////        println("Found row: " + r)
-////        println("Found value: " + Bytes.toString(
-////          r.getValue(family, column)))
-////      }
-//      while (results.hasNext()) {
-//        val r = results.next()
-//        val rowkey = Bytes.toString(r.getRow())
-//        val province: Cell = r.getColumnLatestCell(Bytes.toBytes("cf1"), Bytes.toBytes("c1"))
-//        val city: Cell = r.getColumnLatestCell(Bytes.toBytes("cf1"), Bytes.toBytes("c2"))
-//        // Cell cAge = r.getColumnLatestCell(Bytes.toBytes("f1"),Bytes.toBytes("age"))
-//        val hprovince = new String(CellUtil.cloneValue(province), "utf-8")
-//        val hcity = new String(CellUtil.cloneValue(city), "utf-8")
-//        System.out.println("-----------------------------")
-//        System.out.println(rowkey + "," + hprovince + "," + hcity)
-//      }
-//
-//    } finally {
-//      //确保scanner关闭
-//      scanner.close()
-//    }
-//  }
+  //  def scan(table: HTable, rowKey: Array[Byte], family: Array[Byte], column: Array[Byte]): Unit = {
+  //    val s = new Scan()
+  //    s.addColumn(family, column)
+  //    val scanner:ResultScanner = table.getScanner(s)
+  //    val results = scanner.iterator
+  //    try {
+  ////      for (r <- scanner) {
+  ////        println("Found row: " + r)
+  ////        println("Found value: " + Bytes.toString(
+  ////          r.getValue(family, column)))
+  ////      }
+  //      while (results.hasNext()) {
+  //        val r = results.next()
+  //        val rowkey = Bytes.toString(r.getRow())
+  //        val province: Cell = r.getColumnLatestCell(Bytes.toBytes("cf1"), Bytes.toBytes("c1"))
+  //        val city: Cell = r.getColumnLatestCell(Bytes.toBytes("cf1"), Bytes.toBytes("c2"))
+  //        // Cell cAge = r.getColumnLatestCell(Bytes.toBytes("f1"),Bytes.toBytes("age"))
+  //        val hprovince = new String(CellUtil.cloneValue(province), "utf-8")
+  //        val hcity = new String(CellUtil.cloneValue(city), "utf-8")
+  //        System.out.println("-----------------------------")
+  //        System.out.println(rowkey + "," + hprovince + "," + hcity)
+  //      }
+  //
+  //    } finally {
+  //      //确保scanner关闭
+  //      scanner.close()
+  //    }
+  //  }
   def get_province_site(province:String ): ResultSet ={
     //连接mysql得到site
     val driver = "com.mysql.jdbc.Driver"
@@ -113,17 +122,17 @@ object Test {
     val username = "root"
     val password = ""
     var connection:Connection = null
-      Class.forName(driver)
-      connection = DriverManager.getConnection(url, username, password)
+    Class.forName(driver)
+    connection = DriverManager.getConnection(url, username, password)
 
-      val statement = connection.createStatement()
-      val sql ="select * from MAP_PROVINCE_TBL where name="+"'"+province+"'"
-      val resultSet = statement.executeQuery(sql)
-//  if(resultSet.next()) {
-//    println("ResultSet is not null!")
-//  }else{
-//    println("ResultSet is null!")
-//  }
+    val statement = connection.createStatement()
+    val sql ="select * from MAP_PROVINCE_TBL where name="+"'"+province+"'"
+    val resultSet = statement.executeQuery(sql)
+    //  if(resultSet.next()) {
+    //    println("ResultSet is not null!")
+    //  }else{
+    //    println("ResultSet is null!")
+    //  }
     resultSet
   }
   def get_city_site(hcity:String ): ResultSet ={
@@ -140,33 +149,9 @@ object Test {
     val statement = connection.createStatement()
     val resultSet = statement.executeQuery("select * from MAP_CITY_TBL_ where name=" +"'"+ hcity+"'")
 
-//    connection.close()
+    //    connection.close()
     resultSet
   }
-
-  //    //利用spark 读取hbase表格
-  //  def scan(table:HTable,rowkey:String ): Unit ={
-  //    val hbaseRDD = sc.newAPIHadoopRDD(conf,classOf[TableInputFormat],classOf[org.apache.hadoop.hbase.io.ImmutableBytesWritable],
-  //      classOf[org.apache.hadoop.hbase.client.Result])
-  //    val count = hbaseRDD.count()
-  //    hbaseRDD.cache()
-  //    val g =new Get(rowkey.getBytes)
-  //    val result = table.get(g)
-  //    val value = new String (result.getValue("cf1".getBytes,"c2".getBytes),"utf-8")
-  //
-  //    val res = hbaseRDD.take(count.toInt)
-  //    for(j <- 1 until count.toInt){
-  //      var rs = res(j-1)._2
-  //      var kvs = rs.raw()
-  //      for(kv <- kvs){
-  //        println ("rowkey:" + new String(kv.getRow) )+
-  //        "cf:" + new String(kv.getFamily)+
-  //        "column:" + new String (kv.getQualifierArray())
-  //        "value" + new String (kv.getValue)
-  //      }
-  //    }
-  //  }
-
   //将json文件转为对象数组
   def read_json(inputPath: String): List[city] = {
     val allCity = fromJson[List[city]](FileUtils.readFileToString(new File(inputPath), "UTF-8"))
@@ -187,7 +172,7 @@ object Test {
     val inputPath = "C:/Users/109/Desktop/ChinaCity/ChinaCityList.json"
     val allCity = read_json(inputPath)
     val colFamily = Array("cf1","site")
-    val table = create_table("city", colFamily)
+    val table = create_table("test", colFamily)
 
     //插入全国数据
     insertData("0000", "中国", "中国","108.5525,34,3227",table)
@@ -224,6 +209,5 @@ object Test {
     println(new String(s, "utf-8"))
     println(new String(c, "utf-8"))
   }
+
 }
-
-
