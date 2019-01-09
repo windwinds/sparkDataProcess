@@ -30,6 +30,10 @@
              <value>true</value>
        </property>
        <property>
+           <name>hbase.master</name>
+           <value>hdfs://master:60000</value>
+       </property>
+       <property>
              <name>hbase.zookeeper.quorum</name>
              <value>master,dell4,xiadclinux</value>
        </property>

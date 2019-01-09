@@ -16,7 +16,9 @@ import org.apache.hadoop.hbase.util.Bytes
 class GridDataToHBase {
 
   //create 'gridAirData', 'aqi', 'pm25', 'pm10', 'co', 'no2', 'ozone1hour', 'ozone8hour', 'so2', 'properties'
-  val tableName = "gridAirData"
+  val tableName = "gridAirData1"
+  val tableFamilies = Array("aqi", "pm25", "pm10", "co", "no2", "ozone1hour", "ozone8hour", "so2", "properties")
+  HBaseClient.create_table(tableName, tableFamilies)
 
   val hTable = HBaseClient.getHTableByName(tableName)
 
@@ -48,22 +50,22 @@ class GridDataToHBase {
       val colTileNum = tileData._6._2
 
       val put = new Put(Bytes.toBytes(rowKey))
-      put.add(Bytes.toBytes("properties"), Bytes.toBytes("hight"), Bytes.toBytes(hightWidth._1))
-      put.add(Bytes.toBytes("properties"), Bytes.toBytes("width"), Bytes.toBytes(hightWidth._2))
+      put.addColumn(Bytes.toBytes("properties"), Bytes.toBytes("hight"), Bytes.toBytes(hightWidth._1))
+      put.addColumn(Bytes.toBytes("properties"), Bytes.toBytes("width"), Bytes.toBytes(hightWidth._2))
 
       //只在编号为0的瓦片记录行中存储，节省空间
       if (hilbertCode == 0){
-        put.add(Bytes.toBytes("properties"), Bytes.toBytes("row"), Bytes.toBytes(rowTileNum))
-        put.add(Bytes.toBytes("properties"), Bytes.toBytes("col"), Bytes.toBytes(colTileNum))
-        put.add(Bytes.toBytes("properties"), Bytes.toBytes("lng"), Bytes.toBytes(lnglat._1))
-        put.add(Bytes.toBytes("properties"), Bytes.toBytes("lat"), Bytes.toBytes(lnglat._2))
-        put.add(Bytes.toBytes("properties"), Bytes.toBytes("cellSize"), Bytes.toBytes(cellSize))
+        put.addColumn(Bytes.toBytes("properties"), Bytes.toBytes("x"), Bytes.toBytes(rowTileNum))
+        put.addColumn(Bytes.toBytes("properties"), Bytes.toBytes("y"), Bytes.toBytes(colTileNum))
+        put.addColumn(Bytes.toBytes("properties"), Bytes.toBytes("lng"), Bytes.toBytes(lnglat._1))
+        put.addColumn(Bytes.toBytes("properties"), Bytes.toBytes("lat"), Bytes.toBytes(lnglat._2))
+        put.addColumn(Bytes.toBytes("properties"), Bytes.toBytes("cellSize"), Bytes.toBytes(cellSize))
       }
 
       for (pollutionIndex <- Range(0, columnFamilyList.size())){
         val data = dataList.get(pollutionIndex)
         val dataBytes = DataTransformUtil.floatArrayToBytesArray(data)
-        put.add(Bytes.toBytes(columnFamilyList.get(pollutionIndex)), Bytes.toBytes("data"), dataBytes)
+        put.addColumn(Bytes.toBytes(columnFamilyList.get(pollutionIndex)), Bytes.toBytes("data"), dataBytes)
       }
       putList.add(put)
     }
