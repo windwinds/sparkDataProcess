@@ -60,6 +60,7 @@ class GridDataToHBase {
         put.addColumn(Bytes.toBytes("properties"), Bytes.toBytes("lng"), Bytes.toBytes(lnglat._1))
         put.addColumn(Bytes.toBytes("properties"), Bytes.toBytes("lat"), Bytes.toBytes(lnglat._2))
         put.addColumn(Bytes.toBytes("properties"), Bytes.toBytes("cellSize"), Bytes.toBytes(cellSize))
+        println("x: " + rowTileNum + "  y: " + colTileNum + " lng: " + lnglat._1 + " lat: " + lnglat._2 + " cellSize: " + cellSize)
       }
 
       for (pollutionIndex <- Range(0, columnFamilyList.size())){

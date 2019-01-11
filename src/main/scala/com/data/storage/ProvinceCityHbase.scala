@@ -145,8 +145,8 @@ import org.apache.spark.{SparkConf, SparkContext}
     val inputPath = "I:\\毕设\\实验\\数据\\ChinaCityList.json"
     val allCity = read_json(inputPath)
     val colFamily = Array("cf1")
-    val table = HBaseClient.create_table("province_city1", colFamily)
-
+    HBaseClient.create_table("province_city1", colFamily)
+    val table = HBaseClient.getHTableByName("province_city1")
     //插入全国数据
     insertData("0000", "中国", "中国","[108.5525,34.3227]",table)
     for (city <- allCity) {

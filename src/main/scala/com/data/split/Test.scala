@@ -102,34 +102,34 @@ object Test {
 //    }
 
     //插入数据
-//    val pollutionList = Array("aqi", "pm25", "pm10", "co", "no2", "ozone1hour", "ozone8hour", "so2")
-//
-//    val time = "2016-11-11 08:00:00"
-//
-//    val province = "北京"
-//
-//    val city = "北京"
-//
-//    val pollutionTileList = new ArrayList[ArrayList[(Int, Array[Float], (Double, Double), Double, (Int, Int), (Int, Int))]]
-//
-//    for (i <- Range(0, pollutionList.length)){
-//      val tileSplit = new TileSplit("data/beijing.asc")
-//      tileSplit.readAscFileAndInitData()
-//      val tileResult = tileSplit.splitTile(16)
-//      val hilbertTileList = tileSplit.tileNumToHilbertCode(tileResult)
-//      pollutionTileList.add(hilbertTileList)
-//    }
-//
-//    val tileList = transformTileList(pollutionTileList)
-//
-//    val gridDataToHBase = new GridDataToHBase
-//    val date = "2016-06-12 08:00:00"
-//    val format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
-//    val d = format.parse(date)
-//    val timestamp = new Timestamp(d.getTime()).getTime/1000
-//    gridDataToHBase.addData(timestamp, 1, 1, tileList, arrayToList(pollutionList))
+    val pollutionList = Array("aqi", "pm25", "pm10", "co", "no2", "ozone1hour", "ozone8hour", "so2")
 
-    getProvinceCityInfoFromHBase()
+    val time = "2016-11-11 08:00:00"
+
+    val province = "北京"
+
+    val city = "北京"
+
+    val pollutionTileList = new ArrayList[ArrayList[(Int, Array[Float], (Double, Double), Double, (Int, Int), (Int, Int))]]
+
+    for (i <- Range(0, pollutionList.length)){
+      val tileSplit = new TileSplit("data/beijing.asc")
+      tileSplit.readAscFileAndInitData()
+      val tileResult = tileSplit.splitTile(16)
+      val hilbertTileList = tileSplit.tileNumToHilbertCode(tileResult)
+      pollutionTileList.add(hilbertTileList)
+    }
+
+    val tileList = transformTileList(pollutionTileList)
+
+    val gridDataToHBase = new GridDataToHBase
+    val date = "2016-06-12 08:00:00"
+    val format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
+    val d = format.parse(date)
+    val timestamp = new Timestamp(d.getTime()).getTime/1000
+    gridDataToHBase.addData(timestamp, 1, 1, tileList, arrayToList(pollutionList))
+
+    //getProvinceCityInfoFromHBase()
 
   }
 
