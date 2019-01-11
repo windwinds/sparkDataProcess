@@ -111,7 +111,7 @@ object SparkToHBase {
 
   def main(args: Array[String]): Unit = {
 
-    val fc = Array(("aqi", Array("data")), ("pm25", Array("data")), ("properties", Array("lng", "lat", "cellSize")))
+    val fc = Array(("aqi", Array("data")), ("pm25", Array("data")), ("properties", Array("lng", "lat", "cellSize", "x", "y", "hight", "width")))
     val date = "2016-06-12 08:00:00"
     val format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
     val d = format.parse(date)
@@ -126,6 +126,7 @@ object SparkToHBase {
 
     val propertyMap = getPropertiesFromTableRdd(tableRdd)
     printHashMap(propertyMap)
+
   }
 
 

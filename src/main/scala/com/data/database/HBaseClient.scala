@@ -34,7 +34,7 @@ object HBaseClient {
     connection.getTable(TableName.valueOf(tableName))
   }
 
-  def create_table(table_name: String, colFamily: Array[String]): Table = {
+  def create_table(table_name: String, colFamily: Array[String]){
     /*
     *@Description :创建hbase表
     *@Param 表名，列族
@@ -64,8 +64,7 @@ object HBaseClient {
 //      }
 //      hadmin.createTable(tableDesc)
 //    }
-    val table = getHTableByName(table_name)
-    table
+
   }
 
 
