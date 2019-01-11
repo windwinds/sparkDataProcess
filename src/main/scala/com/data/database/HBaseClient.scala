@@ -6,7 +6,8 @@ import java.util.HashMap
 import java.util.ArrayList
 
 import com.data.storage.GridDataToHBase
-import org.apache.hadoop.hbase.{HBaseConfiguration, TableName}
+import com.data.storage.ProvinceCityHbase.conf
+import org.apache.hadoop.hbase.{HBaseConfiguration, HColumnDescriptor, HTableDescriptor, TableName}
 import org.apache.hadoop.hbase.client._
 import org.apache.hadoop.hbase.util.Bytes
 
@@ -31,6 +32,40 @@ object HBaseClient {
 
   def getHTableByName(tableName: String)={
     connection.getTable(TableName.valueOf(tableName))
+  }
+
+  def create_table(table_name: String, colFamily: Array[String]): Table = {
+    /*
+    *@Description :创建hbase表
+    *@Param 表名，列族
+    *@Return 创建的hbase表
+    *@Author:LiumingYan
+    *@Date
+    */
+    //conf.set("hbase.zookeeper.quorum", "master, dell4, xiadclinux")
+    val tableName = TableName.valueOf(table_name)
+    val hadmin = connection.getAdmin()
+    if (!hadmin.tableExists(tableName)) {
+      print("Table Not Exists! Create Table")
+      val tableDesc = new HTableDescriptor(table_name)
+      for (str <- colFamily) {
+        tableDesc.addFamily(new HColumnDescriptor(str))
+      }
+      hadmin.createTable(tableDesc)
+    }
+//    else {
+//      println("Table  Exists!")
+//      hadmin.disableTable(tableName)
+//      hadmin.deleteTable(tableName)
+//      println("Table  had deleted!")
+//      val tableDesc = new HTableDescriptor(table_name)
+//      for (str <- colFamily) {
+//        tableDesc.addFamily(new HColumnDescriptor(str))
+//      }
+//      hadmin.createTable(tableDesc)
+//    }
+    val table = getHTableByName(table_name)
+    table
   }
 
 

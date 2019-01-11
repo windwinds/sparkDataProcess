@@ -1,10 +1,13 @@
 package com.data.storage
 
 import java.sql.{Connection, DriverManager, ResultSet}
+
 import com.owlike.genson.defaultGenson._
 import java.io.File
+
+import com.data.database.HBaseClient
 import org.apache.commons.io.FileUtils
-import org.apache.hadoop.hbase.client.{Get, HBaseAdmin, HTable, Put}
+import org.apache.hadoop.hbase.client._
 import org.apache.hadoop.hbase.util.Bytes
 import org.apache.hadoop.hbase.{HBaseConfiguration, HColumnDescriptor, HTableDescriptor}
 import org.apache.spark.{SparkConf, SparkContext}
@@ -38,48 +41,18 @@ import org.apache.spark.{SparkConf, SparkContext}
 
   case class city_result(name: String, code: String)
 
-  def create_table(table_name: String, colFamily: Array[String]): HTable = {
-    /*
-    *@Description :创建hbase表
-    *@Param 表名，列族
-    *@Return 创建的hbase表
-    *@Author:LiumingYan
-    *@Date
-    */
-    //conf.set("hbase.zookeeper.quorum", "master, dell4, xiadclinux")
-    val hadmin = new HBaseAdmin(conf)
-    if (!hadmin.isTableAvailable(table_name)) {
-      print("Table Not Exists! Create Table")
-      val tableDesc = new HTableDescriptor(table_name)
-      for (str <- colFamily) {
-        tableDesc.addFamily(new HColumnDescriptor(str))
-      }
-      hadmin.createTable(tableDesc)
-    } else {
-      print("Table  Exists!")
-      hadmin.disableTable(table_name)
-      hadmin.deleteTable(table_name)
-      print("Table  had deleted!")
-      val tableDesc = new HTableDescriptor(table_name)
-      for (str <- colFamily) {
-        tableDesc.addFamily(new HColumnDescriptor(str))
-      }
-      hadmin.createTable(tableDesc)
-    }
-    val table = new HTable(conf, table_name)
-    table
-  }
 
-  def insertData(hcode: String, hprovince: String, hcity: String,site:String,table: HTable): Unit = {
+
+  def insertData(hcode: String, hprovince: String, hcity: String,site:String,table: Table): Unit = {
     val put: Put = new Put(Bytes.toBytes(hcode))
-    put.add(Bytes.toBytes("cf1"), Bytes.toBytes("c1"), Bytes.toBytes(hprovince))
-    put.add(Bytes.toBytes("cf1"), Bytes.toBytes("c2"), Bytes.toBytes(hcity))
+    put.addColumn(Bytes.toBytes("cf1"), Bytes.toBytes("province"), Bytes.toBytes(hprovince))
+    put.addColumn(Bytes.toBytes("cf1"), Bytes.toBytes("city"), Bytes.toBytes(hcity))
 
-    put.add(Bytes.toBytes("site"), Bytes.toBytes(""), Bytes.toBytes(site))
+    put.addColumn(Bytes.toBytes("cf1"), Bytes.toBytes("lnglat"), Bytes.toBytes(site))
     table.put(put)
   }
 
-  def selectOneColumnByRowKey(table: HTable, rowKey: Array[Byte], family: Array[Byte], column: Array[Byte]): Array[Byte] = {
+  def selectOneColumnByRowKey(table: Table, rowKey: Array[Byte], family: Array[Byte], column: Array[Byte]): Array[Byte] = {
     val get = new Get(rowKey)
     get.addColumn(family, column)
     val result = table.get(get)
@@ -169,13 +142,13 @@ import org.apache.spark.{SparkConf, SparkContext}
 
   def main(args: Array[String]): Unit = {
     //json文件处理
-    val inputPath = "C:/Users/109/Desktop/ChinaCity/ChinaCityList.json"
+    val inputPath = "I:\\毕设\\实验\\数据\\ChinaCityList.json"
     val allCity = read_json(inputPath)
-    val colFamily = Array("cf1","site")
-    val table = create_table("test", colFamily)
+    val colFamily = Array("cf1")
+    val table = HBaseClient.create_table("province_city1", colFamily)
 
     //插入全国数据
-    insertData("0000", "中国", "中国","108.5525,34,3227",table)
+    insertData("0000", "中国", "中国","[108.5525,34.3227]",table)
     for (city <- allCity) {
       //插入省级数据
       hprovince = city.province

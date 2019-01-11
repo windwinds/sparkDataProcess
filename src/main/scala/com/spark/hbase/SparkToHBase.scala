@@ -37,7 +37,7 @@ object SparkToHBase {
   conf.set("hbase.rest.port", "8090")
 
   val propertyFamilyName = "properties"
-  val propertyColumnsName = Array("row", "col", "lng", "lat", "cellSize")
+  val propertyColumnsName = Array("x", "y", "lng", "lat", "cellSize", "hight", "width")
 
   val SparkConfig = new SparkConfig()
   val sc = SparkConfig.getSparkContext("local")
@@ -120,7 +120,7 @@ object SparkToHBase {
     val startRowKey = gridDataToHBase.generateRowKeyNoHilbertCode(timestamp, 1, 1)
     val stopRowKey = gridDataToHBase.generateRowKeyNoHilbertCode(timestamp, 1, 2)
 
-    val tableRdd = getRddByScanTable("gridAirData", Bytes.toBytes(startRowKey), Bytes.toBytes(stopRowKey), fc)
+    val tableRdd = getRddByScanTable("gridAirData1", Bytes.toBytes(startRowKey), Bytes.toBytes(stopRowKey), fc)
 
     println(tableRdd.count())
 
