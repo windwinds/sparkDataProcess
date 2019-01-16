@@ -71,7 +71,7 @@ class TileSplit(fileName: String) {
     val tileColNum = data.get(0).size()/tileLength + 1
 
     val tileRowColNum = (tileRowNum, tileColNum)
-    val resultList = new ArrayList[((Int, Int), Array[Float], (Double, Double), Double, (Int, Int), (Int, Int))]()
+    val resultList = new ArrayList[((Int, Int), Array[Float], (Double, Double), Double, (Int, Int), (Int, Int), Double)]()
 
     for (i <- Range(0, tileRowNum)){
       var startRowNum = nrows - (i + 1)*tileLength
@@ -117,7 +117,7 @@ class TileSplit(fileName: String) {
             index+=1
           }
         }
-        resultList.add((xy, tileData, lnglat, cellsize, hightWidth, tileRowColNum))
+        resultList.add((xy, tileData, lnglat, cellsize, hightWidth, tileRowColNum, NODATA_value))
 
 
       }
@@ -128,7 +128,7 @@ class TileSplit(fileName: String) {
   }
 
 
-  def tileNumToHilbertCode(tileList: ArrayList[((Int, Int), Array[Float], (Double, Double), Double, (Int, Int), (Int, Int))])={
+  def tileNumToHilbertCode(tileList: ArrayList[((Int, Int), Array[Float], (Double, Double), Double, (Int, Int), (Int, Int), Double)])={
     if (tileList == null || tileList.size()==0){
       println("传入的瓦片数据为空！")
       sys.exit()
@@ -138,7 +138,7 @@ class TileSplit(fileName: String) {
 
     val hilbertN = hilbert.rowNumAndColNumGetN(rowColNum._1, rowColNum._2)
 
-    val resultList = new ArrayList[(Int, Array[Float], (Double, Double), Double, (Int, Int), (Int, Int))]()
+    val resultList = new ArrayList[(Int, Array[Float], (Double, Double), Double, (Int, Int), (Int, Int), Double)]()
 
     for (i <- Range(0, tileList.size())){
 
@@ -146,7 +146,7 @@ class TileSplit(fileName: String) {
       val y = tileList.get(i)._1._2
       val hilbertCode = hilbert.xyToHilbertCode(hilbertN, x, y)
       val tile = tileList.get(i)
-      resultList.add(hilbertCode, tile._2, tile._3, tile._4, tile._5, tile._6)
+      resultList.add(hilbertCode, tile._2, tile._3, tile._4, tile._5, tile._6, tile._7)
 
     }
     resultList

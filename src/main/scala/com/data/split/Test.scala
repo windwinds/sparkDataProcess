@@ -16,9 +16,9 @@ import org.apache.hadoop.hbase.util.Bytes
   */
 object Test {
 
-  def transformTileList(pollutionTileList: ArrayList[ArrayList[(Int, Array[Float], (Double, Double), Double, (Int, Int), (Int, Int))]])={
+  def transformTileList(pollutionTileList: ArrayList[ArrayList[(Int, Array[Float], (Double, Double), Double, (Int, Int), (Int, Int), Double)]])={
 
-    val resultList = new ArrayList[(Int, ArrayList[Array[Float]], (Double, Double), Double, (Int, Int), (Int, Int))]
+    val resultList = new ArrayList[(Int, ArrayList[Array[Float]], (Double, Double), Double, (Int, Int), (Int, Int), Double)]
 
     val tileList = pollutionTileList.get(0)
 
@@ -31,7 +31,7 @@ object Test {
         dataList.add(pollutionTileList.get(j).get(i)._2)
 
       }
-      resultList.add( (tileList.get(i)._1, dataList, tileList.get(i)._3, tileList.get(i)._4, tileList.get(i)._5, tileList.get(i)._6))
+      resultList.add( (tileList.get(i)._1, dataList, tileList.get(i)._3, tileList.get(i)._4, tileList.get(i)._5, tileList.get(i)._6, tileList.get(i)._7))
 
     }
     resultList
@@ -110,7 +110,7 @@ object Test {
 
     val city = "北京"
 
-    val pollutionTileList = new ArrayList[ArrayList[(Int, Array[Float], (Double, Double), Double, (Int, Int), (Int, Int))]]
+    val pollutionTileList = new ArrayList[ArrayList[(Int, Array[Float], (Double, Double), Double, (Int, Int), (Int, Int), Double)]]
 
     for (i <- Range(0, pollutionList.length)){
       val tileSplit = new TileSplit("data/beijing.asc")

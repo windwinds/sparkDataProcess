@@ -7,6 +7,8 @@ import java.util
 import com.data.database.HBaseClient
 import com.data.storage.GridDataToHBase
 import com.spark.config.SparkConfig
+import com.spark.solap.AggregationFunction
+import com.spark.utils.DataTransformUtil
 import org.apache.hadoop.hbase.client.Scan
 import org.apache.hadoop.hbase.HBaseConfiguration
 import org.apache.hadoop.hbase.io.ImmutableBytesWritable
@@ -37,7 +39,7 @@ object SparkToHBase {
   conf.set("hbase.rest.port", "8090")
 
   val propertyFamilyName = "properties"
-  val propertyColumnsName = Array("x", "y", "lng", "lat", "cellSize", "hight", "width")
+  val propertyColumnsName = Array("x", "y", "lng", "lat", "cellSize", "hight", "width", "noData")
 
   val SparkConfig = new SparkConfig()
   val sc = SparkConfig.getSparkContext("local")
@@ -98,6 +100,31 @@ object SparkToHBase {
 
   }
 
+  /**
+    * 从查询结果的tableRdd中获取瓦片像元数据和瓦片长宽
+    * @param tableRdd
+    */
+  def getTileDataRddFromTableRdd(tableRdd: RDD[(ImmutableBytesWritable, Result)], tileDataFamily: String)={
+
+    tableRdd.map(x => {
+
+      val result = x._2
+
+      val rowKey = result.getRow
+
+      val propertyFamilyBytes = Bytes.toBytes(propertyFamilyName)
+      val tileHight = result.getValue(propertyFamilyBytes, Bytes.toBytes("hight"))
+      val tileWidth = result.getValue(propertyFamilyBytes, Bytes.toBytes("width"))
+      val noData = result.getValue(propertyFamilyBytes, Bytes.toBytes("noData"))
+
+      val tileDateFamilyBytes = Bytes.toBytes(tileDataFamily)
+      val tileData = result.getValue(tileDateFamilyBytes, Bytes.toBytes("data"))
+
+      (Bytes.toLong(rowKey), Bytes.toInt(tileHight), Bytes.toInt(tileWidth), Bytes.toDouble(noData),DataTransformUtil.bytesArrayToFloatArray(tileData))
+
+    })
+
+  }
 
   def printHashMap(map: util.HashMap[String, Array[Byte]] ): Unit ={
     val keysIterator = map.keySet().iterator()
@@ -108,10 +135,20 @@ object SparkToHBase {
 
   }
 
+  /**
+    * 将瓦片数据还原成原始栅格数据
+    * @param args
+    */
+  def tileDataToGrid(tileRdd: RDD[(Long, Int, Int, Array[Float])])={
+
+
+
+  }
+
 
   def main(args: Array[String]): Unit = {
 
-    val fc = Array(("aqi", Array("data")), ("pm25", Array("data")), ("properties", Array("lng", "lat", "cellSize", "x", "y", "hight", "width")))
+    val fc = Array(("aqi", Array("data")), ("pm25", Array("data")), ("properties", Array("lng", "lat", "cellSize", "x", "y", "hight", "width", "noData")))
     val date = "2016-06-12 08:00:00"
     val format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
     val d = format.parse(date)
@@ -121,11 +158,18 @@ object SparkToHBase {
     val stopRowKey = gridDataToHBase.generateRowKeyNoHilbertCode(timestamp, 1, 2)
 
     val tableRdd = getRddByScanTable("gridAirData1", Bytes.toBytes(startRowKey), Bytes.toBytes(stopRowKey), fc)
-
     println(tableRdd.count())
-
     val propertyMap = getPropertiesFromTableRdd(tableRdd)
     printHashMap(propertyMap)
+
+    val tileDataRdd = getTileDataRddFromTableRdd(tableRdd, "aqi")
+
+    val firstData = tileDataRdd.first()._5
+
+    firstData.foreach(print)
+
+    val aggregateFun = new AggregationFunction()
+    println(aggregateFun.tileAvg(tileDataRdd))
 
   }
 
