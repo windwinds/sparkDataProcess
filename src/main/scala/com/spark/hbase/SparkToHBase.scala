@@ -115,12 +115,12 @@ object SparkToHBase {
       val propertyFamilyBytes = Bytes.toBytes(propertyFamilyName)
       val tileHight = result.getValue(propertyFamilyBytes, Bytes.toBytes("hight"))
       val tileWidth = result.getValue(propertyFamilyBytes, Bytes.toBytes("width"))
-      val noData = result.getValue(propertyFamilyBytes, Bytes.toBytes("noData"))
+      //val noData = Bytes.toDouble(result.getValue(propertyFamilyBytes, Bytes.toBytes("noData")))
 
       val tileDateFamilyBytes = Bytes.toBytes(tileDataFamily)
       val tileData = result.getValue(tileDateFamilyBytes, Bytes.toBytes("data"))
 
-      (Bytes.toLong(rowKey), Bytes.toInt(tileHight), Bytes.toInt(tileWidth), Bytes.toDouble(noData),DataTransformUtil.bytesArrayToFloatArray(tileData))
+      (Bytes.toLong(rowKey), Bytes.toInt(tileHight), Bytes.toInt(tileWidth), DataTransformUtil.bytesArrayToFloatArray(tileData))
 
     })
 
@@ -164,12 +164,15 @@ object SparkToHBase {
 
     val tileDataRdd = getTileDataRddFromTableRdd(tableRdd, "aqi")
 
-    val firstData = tileDataRdd.first()._5
+    val firstData = tileDataRdd.first()._4
 
     firstData.foreach(print)
 
     val aggregateFun = new AggregationFunction()
     println(aggregateFun.tileAvg(tileDataRdd))
+
+    println(aggregateFun.tileMax(tileDataRdd))
+    println(aggregateFun.tileMin(tileDataRdd))
 
   }
 

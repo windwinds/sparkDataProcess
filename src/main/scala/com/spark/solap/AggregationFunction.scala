@@ -13,37 +13,68 @@ class AggregationFunction {
   /**
     * 基于瓦片的均值聚集函数
     */
-  def tileAvg(tileRdd: RDD[(Long, Int, Int, Double, Array[Float])])={
+  def tileAvg(tileRdd: RDD[(Long, Int, Int,Array[Float])])={
 
     tileRdd.map(x => {
-      val noData = x._4
-      val floatArray = x._5
+      val floatArray = x._4
       var sum = 0.0
       var count = 0
       for (floatValue <- floatArray){
-        if (floatValue != noData){
+        if (floatValue != -9999.0){
           sum += floatValue
           count += 1
         }
       }
       if (sum == 0){
-        ("noData", (1, 0))
+        ("noData", (1, 0.0))
       }else{
         ("avg", (1, sum/(count.toFloat)))
       }
     }).reduceByKey((x,y) => {
-      (x._1 + y._1, x._2 + y._2)
-    }).mapValues(x => x._2/(x._1.toFloat)).collect()
+      (x._1+y._1, x._2+y._2)
+    }).mapValues(x => {
+      x._2/x._1.toFloat
+    }).filter(x => {
+      x._1.equals("avg")
+    }).first()
 
   }
 
 
-  def tileMax()={
+  def tileMax(tileRdd: RDD[(Long, Int, Int,Array[Float])])={
+
+    tileRdd.map(x => {
+
+      val floatArray = x._4
+      var max = 0.0
+      for (floatValue <- floatArray){
+        if (floatValue != -9999.0){
+          max = Math.max(max, floatValue)
+        }
+      }
+      max
+    }).reduce((x, y) => {
+      Math.max(x, y)
+    })
 
   }
 
 
-  def tileMin()={
+  def tileMin(tileRdd: RDD[(Long, Int, Int,Array[Float])])={
+
+    tileRdd.map(x => {
+
+      val floatArray = x._4
+      var min = 9999.0
+      for (floatValue <- floatArray){
+        if (floatValue != -9999.0){
+          min = Math.min(min, floatValue)
+        }
+      }
+      min
+    }).reduce((x, y) => {
+      Math.min(x, y)
+    })
 
   }
 
