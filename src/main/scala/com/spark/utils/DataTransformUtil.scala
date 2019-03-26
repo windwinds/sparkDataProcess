@@ -1,5 +1,8 @@
 package com.spark.utils
 
+import java.text.SimpleDateFormat
+import java.util.Date
+
 import org.apache.hadoop.hbase.util.Bytes
 
 
@@ -51,6 +54,51 @@ object DataTransformUtil {
     }
     result
   }
+
+  /**
+    * 时间戳转日期格式
+    * detail:表示精确到哪有位：hours, day, month, 季节, 年
+    */
+  def timestampToDate(timestamp: Long, detail: String)={
+    val fm = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
+    val date = fm.format(new Date(timestamp*1000))
+    var result = date
+    if (detail.equals("hours")){
+      result = date.split(":")(0)
+    }
+
+    if (detail.equals("day")){
+      result = date.split(" ")(0)
+    }
+
+    if (detail.equals("month")){
+      val arr = date.split("-")
+      result = arr(0) + "-" + arr(1)
+    }
+
+    if (detail.equals("season")){
+      val arr = date.split("-")
+      val month = arr(1)
+      var season = ""
+      if (month >= "01" && month <= "03"){
+        season = "*1"
+      }
+      if (month >= "04" && month <= "06"){
+        season = "*2"
+      }
+      if (month >= "07" && month <= "09"){
+        season = "*3"
+      }
+      if (month >= "10" && month <= "12"){
+        season = "*4"
+      }
+      result = arr(0) + season
+    }
+
+    result
+  }
+
+
 
 
 

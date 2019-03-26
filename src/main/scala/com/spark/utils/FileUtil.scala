@@ -26,10 +26,19 @@ object FileUtil {
     }
   }
 
+  /**
+    * 获取某目录下的所有文件
+    */
+  def getFiles1(dir: File): Array[File] = {
+    dir.listFiles.filter(_.isFile) ++
+      dir.listFiles.filter(_.isDirectory).flatMap(getFiles1)
+  }
 
-
-
-
+  //获取任意多个目录下所有文件
+  def getFiles(inputs: File*): Seq[File] = {
+    inputs.filter(_.isFile) ++
+      inputs.filter(_.isDirectory).flatMap(dir => getFiles(dir.listFiles: _*))
+  }
 
 
 }

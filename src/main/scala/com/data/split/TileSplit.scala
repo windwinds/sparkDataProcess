@@ -36,6 +36,7 @@ class TileSplit(fileName: String) {
     nrows = lines.next().split("\\s+")(1).toInt
     xllcorner = lines.next().split("\\s+")(1).toDouble
     yllcorner = lines.next().split("\\s+")(1).toDouble
+    lines.next()
     cellsize = lines.next().split("\\s+")(1).toDouble
     NODATA_value = lines.next().split("\\s+")(1).toDouble
 
@@ -50,6 +51,16 @@ class TileSplit(fileName: String) {
     }
 
   }
+
+  /**
+    * 得到元数据信息，单独存表
+    */
+  def getPropertiesFromAsc()={
+
+    (ncols, nrows, xllcorner, yllcorner, cellsize, NODATA_value)
+
+  }
+
 
   /**
     * 将数据划分为瓦片块

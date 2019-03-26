@@ -20,7 +20,7 @@ class SparkConfig {
 
   def setConf(sparkConf: SparkConf): Unit ={
     sparkConf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
-    sparkConf.registerKryoClasses(Array(classOf[org.apache.hadoop.hbase.io.ImmutableBytesWritable]))
+    sparkConf.registerKryoClasses(Array(classOf[org.apache.hadoop.hbase.io.ImmutableBytesWritable], classOf[com.spark.solap.SpatioTemporalQuery]))
   }
 
 

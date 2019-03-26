@@ -49,7 +49,9 @@ object HBaseClient {
       print("Table Not Exists! Create Table")
       val tableDesc = new HTableDescriptor(table_name)
       for (str <- colFamily) {
-        tableDesc.addFamily(new HColumnDescriptor(str))
+        val hColumnDescriptor = new HColumnDescriptor(str)
+        hColumnDescriptor.setMaxVersions(Int.MaxValue)
+        tableDesc.addFamily(hColumnDescriptor)
       }
       hadmin.createTable(tableDesc)
     }
@@ -255,8 +257,8 @@ object HBaseClient {
 
     val gridDataToHBase = new GridDataToHBase()
 
-    val startRowKey = gridDataToHBase.generateRowKeyNoHilbertCode(timestamp, 1, 1)
-    val stopRowKey = gridDataToHBase.generateRowKeyNoHilbertCode(timestamp, 1, 2)
+    val startRowKey = gridDataToHBase.generateRowKeyNoHilbertCode(1, 1)
+    val stopRowKey = gridDataToHBase.generateRowKeyNoHilbertCode(1, 2)
 
     val result = scanTable("gridAirData", Bytes.toBytes(startRowKey), Bytes.toBytes(stopRowKey), fc)
     println(result)
