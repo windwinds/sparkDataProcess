@@ -119,6 +119,8 @@ object SparkToHBase {
     val gridDataToHBase = new GridDataToHBase()
     val startRowKey = gridDataToHBase.generateRowKeyNoHilbertCode(timestamp, 1, 1)
     val stopRowKey = gridDataToHBase.generateRowKeyNoHilbertCode(timestamp, 1, 2)
+    println(startRowKey)
+    println(stopRowKey)
 
     val tableRdd = getRddByScanTable("gridAirData1", Bytes.toBytes(startRowKey), Bytes.toBytes(stopRowKey), fc)
 

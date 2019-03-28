@@ -1,5 +1,8 @@
 package com.spark.utils
 
+import java.io.{ByteArrayInputStream, DataInputStream, EOFException, IOException}
+import java.nio.ByteBuffer
+
 import org.apache.hadoop.hbase.util.Bytes
 
 
@@ -22,6 +25,20 @@ object DataTransformUtil {
       }
     }
     byteArray
+  }
+  def bytesArrayToFloatArray(bytesArray: Array[Byte]) ={
+    val floatArray = new Array[Float](bytesArray.length/4)
+    var float = new Array[Byte](4)
+    var index = 0
+    for(i <- Range(0,bytesArray.length,4)) {
+      float(0) = bytesArray(i)
+      float(1) = bytesArray(i + 1)
+      float(2) = bytesArray(i + 2)
+      float(3) = bytesArray(i + 3)
+      floatArray(index) = ByteBuffer.wrap(float).getFloat()
+      index+=1
+    }
+    floatArray
   }
 
 

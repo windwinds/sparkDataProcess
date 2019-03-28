@@ -46,15 +46,15 @@ object HBaseClient {
     val tableName = TableName.valueOf(table_name)
     val hadmin = connection.getAdmin()
     if (!hadmin.tableExists(tableName)) {
-      print("Table Not Exists! Create Table")
+      println("Table Not Exists! Create Table")
       val tableDesc = new HTableDescriptor(table_name)
       for (str <- colFamily) {
         tableDesc.addFamily(new HColumnDescriptor(str))
       }
       hadmin.createTable(tableDesc)
     }
-//    else {
-//      println("Table  Exists!")
+    else {
+      println("Table  Exists!")
 //      hadmin.disableTable(tableName)
 //      hadmin.deleteTable(tableName)
 //      println("Table  had deleted!")
@@ -63,7 +63,7 @@ object HBaseClient {
 //        tableDesc.addFamily(new HColumnDescriptor(str))
 //      }
 //      hadmin.createTable(tableDesc)
-//    }
+    }
 
   }
 
