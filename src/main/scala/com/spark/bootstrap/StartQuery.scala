@@ -53,26 +53,26 @@ object StartQuery {
     //printHashMap(propertyMap)
 
     //tableRdd.persist()
-    val tileDataRdd = getTileDataWithPropertyRddFromTableRdd(tableRdd, pollution)
-    val spatioTemporalQuery = new SpatioTemporalQuery()
-//    val startTime = System.currentTimeMillis()
+    //tableRdd.persist()
+    tableRdd.count()
+//    val tileDataRdd = getTileDataWithPropertyRddFromTableRdd(tableRdd, pollution)
+//    tileDataRdd.persist()
+//    tileDataRdd.count()
+//
+//    val spatioTemporalQuery = new SpatioTemporalQuery()
+
 
     //时间查询
 //    val resultRdd = spatioTemporalQuery.regularPatternInDay(tileDataRdd, timeDimensionHierarchy)
-    //println(pollution + "---------------------------------------------------------------------------------")
-//    resultRdd.foreach(result => {
-//      //println("(" + result._1 + ", " + result._2 + ")")
-//      println(result._2.formatted("%.1f"))
-//
-//    })
+//    resultRdd.count()
 //    resultRdd.coalesce(1).saveAsTextFile("file:///home/lyc/samba/query_result")
-//    println(System.currentTimeMillis()-startTime)
 
 
     //空间查询
-    val tileMapRdd = spatioTemporalQuery.spatialQuery(tileDataRdd, "")
-    val ascRdd = spatioTemporalQuery.tileToAscRaster(tileMapRdd, ascInfoBroadCast.value)
-    ascRdd.coalesce(1).map(kv=>kv._2).saveAsTextFile("file:///home/lyc/samba/lyc/asc_result")
+//    val tileMapRdd = spatioTemporalQuery.spatialQuery(tileDataRdd, "")
+//    tileMapRdd.count()
+//    val ascRdd = spatioTemporalQuery.tileToAscRaster(tileMapRdd, ascInfoBroadCast.value)
+//    ascRdd.coalesce(1).map(kv=>kv._2).saveAsTextFile("file:///home/lyc/samba/lyc/asc_result")
 
     //resultRdd.saveAsTextFile("file:///home/lyc/samba/output.txt")
 

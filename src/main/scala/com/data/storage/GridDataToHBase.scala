@@ -16,7 +16,7 @@ import org.apache.hadoop.hbase.util.Bytes
 class GridDataToHBase {
 
   //create 'gridAirData', 'aqi', 'pm25', 'pm10', 'co', 'no2', 'ozone1hour', 'ozone8hour', 'so2', 'properties'
-  val tableName = "gridAirDataWithProperties_ALL"
+  val tableName = "gridAirDataWithProperties_region1G_ALL"
   val tableFamilies = Array("aqi", "pm25", "pm10", "co", "no2", "so2", "properties")
   HBaseClient.create_table(tableName, tableFamilies)
 

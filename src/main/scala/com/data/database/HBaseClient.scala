@@ -9,6 +9,7 @@ import com.data.storage.GridDataToHBase
 import com.data.storage.ProvinceCityHbase.conf
 import org.apache.hadoop.hbase.{HBaseConfiguration, HColumnDescriptor, HTableDescriptor, TableName}
 import org.apache.hadoop.hbase.client._
+import org.apache.hadoop.hbase.regionserver.ConstantSizeRegionSplitPolicy
 import org.apache.hadoop.hbase.util.Bytes
 
 import scala.collection.mutable
@@ -48,6 +49,8 @@ object HBaseClient {
     if (!hadmin.tableExists(tableName)) {
       print("Table Not Exists! Create Table")
       val tableDesc = new HTableDescriptor(table_name)
+      tableDesc.setValue(HTableDescriptor.SPLIT_POLICY, classOf[ConstantSizeRegionSplitPolicy].getName)
+      tableDesc.setMaxFileSize(1024*1024*1024)
       for (str <- colFamily) {
         val hColumnDescriptor = new HColumnDescriptor(str)
         hColumnDescriptor.setMaxVersions(Int.MaxValue)

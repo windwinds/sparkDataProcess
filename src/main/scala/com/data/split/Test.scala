@@ -193,8 +193,8 @@ object Test {
     val endDate = "2017-12-32"
 
     //insertAirDataByPath("K:\\毕设\\实验\\数据\\插值\\湖北-武汉-aqi-pm25-pm10", startDate, endDate)
-    //insertAirDataByPath("K:\\毕设\\实验\\数据\\插值\\湖北-武汉-co-no2-so2", startDate, endDate)
-    //insertAirDataByPath("K:\\毕设\\实验\\数据\\插值\\湖北-其它-pm25", startDate, endDate)
+    insertAirDataByPath("K:\\毕设\\实验\\数据\\插值\\湖北-武汉-co-no2-so2", startDate, endDate)
+    insertAirDataByPath("K:\\毕设\\实验\\数据\\插值\\湖北-其它-pm25", startDate, endDate)
     insertAirDataByPath("K:\\毕设\\实验\\数据\\插值\\湖北省-pm25", startDate, endDate)
 
     //insertAirDataByPath("K:\\毕设\\实验\\数据\\插值\\test", startDate, endDate)

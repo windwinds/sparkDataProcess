@@ -57,9 +57,10 @@ object StartApplication {
     val sqlContext = new HiveContext(sc)
     val airDataFrame = sqlContext.createDataFrame(airDataETL.transformRdd(addLocationRdd))
     airDataFrame.registerTempTable("airData")
-    val select = sqlContext.sql("select * from airData")
-    select.show(100)
+//    val select = sqlContext.sql("select * from airData")
+//    select.show(100)
     airDataFrame.write.mode("overwrite").saveAsTable("solap.etlAirData_all")
+    println("")
 
   }
 

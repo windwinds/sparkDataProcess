@@ -5,6 +5,7 @@ import java.text.SimpleDateFormat
 import java.util
 
 import com.data.database.HBaseClient
+import com.data.database.HBaseClient.{getHTableByName, getValueFromResult}
 import com.data.split.Test.getProvinceCityInfoFromHBase
 import com.data.storage.GridDataToHBase
 import com.spark.config.SparkConfig
@@ -273,15 +274,50 @@ object SparkToHBase {
   }
 
 
+  def select(tableName: String, startRowKey: Array[Byte], stopRowKey: Array[Byte], startTime: Long, endTime: Long, fc: Array[(String, Array[String])])={
+
+    val scan = new Scan()
+
+    scan.setStartRow(startRowKey).setStopRow(stopRowKey)
+
+    scan.setMaxVersions()
+    scan.setTimeRange(startTime, endTime)
+
+    for (j <- Range(0, fc.length)){
+
+      val family = fc(j)._1
+      val columns = fc(j)._2
+
+      val familyBytes = Bytes.toBytes(family)
+
+      for (k <- Range(0, columns.length)){
+
+        scan.addColumn(familyBytes, Bytes.toBytes(columns(k)))
+
+      }
+    }
+    val htable = getHTableByName(tableName)
+
+    val resultScanner = htable.getScanner(scan)
+    val it = resultScanner.iterator()
+    while(it.hasNext){
+      val result = it.next()
+    }
+    resultScanner.close()
+
+  }
+
+
+
   def main(args: Array[String]): Unit = {
     val SparkConfig = new SparkConfig()
     val sc = SparkConfig.getSparkContext("local")
 
-    val ascInfoBroadCast = broadCastAscInfo(sc)
+    //val ascInfoBroadCast = broadCastAscInfo(sc)
 
     val fc = Array(("aqi", Array("data")), ("pm25", Array("data")),("pm10", Array("data")),("co", Array("data")),("no2", Array("data")),("so2", Array("data")),("properties", Array("lng", "lat", "cellSize", "x", "y", "hight", "width", "noData")))
-    val startDate = "2016-01-01 00:00:00"
-    val endDate = "2016-01-02 00:00:00"
+    val startDate = "2015-01-01 00:00:00"
+    val endDate = "2015-08-01 00:00:00"
     val startTimeStamp = dateToTimeStamp(startDate)
     val endTimeStamp = dateToTimeStamp(endDate)
     val gridDataToHBase = new GridDataToHBase()
@@ -291,27 +327,32 @@ object SparkToHBase {
     val provinceCity = getProvinceAndCityNoByName(province, city)
     val startRowKey = gridDataToHBase.generateRowKeyNoHilbertCode(provinceCity._1, provinceCity._2)
     val stopRowKey = gridDataToHBase.generateRowKeyNoHilbertCode(provinceCity._1, provinceCity._2 + 1)
-
+    val startTime = System.currentTimeMillis()
     val tableRdd = getRddByScanTable(sc, "gridAirDataWithProperties_ALL", Bytes.toBytes(startRowKey), Bytes.toBytes(stopRowKey),startTimeStamp,endTimeStamp, fc)
-    //println(tableRdd.count())
+    println(tableRdd.count())
+    println(System.currentTimeMillis() - startTime)
+    //
+//    val startTime = System.currentTimeMillis()
+//    select("gridAirDataWithProperties_ALL", Bytes.toBytes(startRowKey), Bytes.toBytes(stopRowKey),startTimeStamp,endTimeStamp, fc)
+//    println(System.currentTimeMillis() - startTime)
     //val propertyMap = getPropertiesFromTableRdd(tableRdd)
     //printHashMap(propertyMap)
 
     //tableRdd.persist()
 
     //val pollutions = Array("aqi", "pm25", "pm10", "co", "no2", "so2")
-    val pollution = "pm25"
-    println(pollution + "---------------------------------------------------------------------------------")
-    val tileDataRdd = getTileDataWithPropertyRddFromTableRdd(tableRdd, pollution)
-    val spatioTemporalQuery = new SpatioTemporalQuery()
+//    val pollution = "pm25"
+//    println(pollution + "---------------------------------------------------------------------------------")
+//    val tileDataRdd = getTileDataWithPropertyRddFromTableRdd(tableRdd, pollution)
+//    val spatioTemporalQuery = new SpatioTemporalQuery()
 //    val result = spatioTemporalQuery.regularPatternInDay(tileDataRdd, "day")
 //
 //    result.foreach(println)
 
     //空间查询
-    val tileMapRdd = spatioTemporalQuery.spatialQuery(tileDataRdd, "")
-    val ascRdd = spatioTemporalQuery.tileToAscRaster(tileMapRdd, ascInfoBroadCast.value)
-    ascRdd.coalesce(1).map(kv=>kv._2).saveAsTextFile("result")
+//    val tileMapRdd = spatioTemporalQuery.spatialQuery(tileDataRdd, "")
+//    val ascRdd = spatioTemporalQuery.tileToAscRaster(tileMapRdd, ascInfoBroadCast.value)
+//    ascRdd.coalesce(1).map(kv=>kv._2).saveAsTextFile("result")
 
 
     //println(tileDataRdd.count())
